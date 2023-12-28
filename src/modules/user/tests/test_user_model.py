@@ -34,3 +34,13 @@ class UserModelTest(TestCase):
                 password='test_pass123',
             )
             self.assertEqual(user.email, email[1])
+
+    def test_create_superuser(self):
+        """test creating a superuser is successful."""
+        user = get_user_model().objects.create_superuser(
+            email='testadmin@example.com',
+            password='test_pass123',
+        )
+
+        self.assertTrue(user.is_superuser)
+        self.assertTrue(user.is_active)

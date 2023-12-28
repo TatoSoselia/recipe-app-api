@@ -20,6 +20,10 @@ class UserManager(BaseUserManager):
 
         return user
 
+    def create_superuser(self, email, password):
+        """Create, save and return a new user"""
+        pass
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     """User in system."""
