@@ -20,7 +20,7 @@ endif
 # Create a new Django app
 startapp:
 	@echo "Creating a new Django app named $(STARTAPP_ARGS)..."
-	docker-compose run --rm api sh -c "cd apps && mkdir $(STARTAPP_ARGS) && \
+	docker compose run --rm api sh -c "cd apps && mkdir $(STARTAPP_ARGS) && \
 	django-admin startapp $(STARTAPP_ARGS) $(STARTAPP_ARGS) && \
 	cd $(STARTAPP_ARGS) && rm tests.py && \
 	mkdir tests && cd tests && touch __init__.py"
