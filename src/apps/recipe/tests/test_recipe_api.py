@@ -12,6 +12,8 @@ from apps.recipe.serializers import RecipeSerializer, RecipeDetailSerializer
 from rest_framework import status
 from rest_framework.test import APIClient
 
+import decimal
+
 RECIPE_URL = reverse('recipe:recipe-list')
 
 
@@ -73,3 +75,19 @@ class PrivateRecipeApiTest(TestCase):
 
         serializer = RecipeDetailSerializer(recipe)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_recipe(self):
+        """Test creating a new recipe."""
+        payload = {
+            "title": "Test Recipe",
+            "time_minutes": 30,
+            "price": decimal.Decimal("5.99")
+        }
+
+        res = self.client.post(RECIPE_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipe = Recipe.objects.get(id=res.data['id'])
+        for kay, value in payload.items():
+            self.assertEqual(getattr(recipe, kay), value)
+        self.assertEqual(recipe.user, self.user)
