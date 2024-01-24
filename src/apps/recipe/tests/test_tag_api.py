@@ -52,12 +52,12 @@ class PrivateTagApiTest(TestCase):
     def test_tags_limited_to_user(self):
         """Test retrieving tags for authenticated user is limited to user."""
         other_user = UserFactory.create()
-        tag = TagFactory.create_batch(1, user=self.user)[0]
+        tag = TagFactory.create_batch(1, user=self.user)
         TagFactory.create_batch(3, user=other_user)
 
         res = self.client.get(TAG_URL)
+        serializer = TagSerializer(tag, many=True)
+
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res), 1)
-        self.assertEqual(res.data[0]['name'], tag.name)
-        self.assertEqual(res.data[0]['id'], tag.id)
-        self.assertEqual(res.data[0]['user'], tag.user)
+        self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data, serializer.data)
