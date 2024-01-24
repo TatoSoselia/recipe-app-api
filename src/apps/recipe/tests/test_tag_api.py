@@ -16,6 +16,11 @@ from rest_framework.test import APIClient
 TAG_URL = reverse('recipe:tag-list')
 
 
+def detail_url(tag_id):
+    """Create and return a tag detail url."""
+    return reverse('recipe:tag-detail', args=[tag_id])
+
+
 class PublicTagApiTests(TestCase):
     """Test unauthenticated api requests."""
 
@@ -61,3 +66,16 @@ class PrivateTagApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data, serializer.data)
+
+    def test_update_tag(self):
+        """Test updating a tag."""
+        tag = TagFactory.create(user=self.user)
+
+        url = detail_url(tag.id)
+        payload = {'name': 'updated name'}
+
+        res = self.client.patch(url, data=payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        tag.refresh_from_db()
+        self.assertEqual(tag.name, payload['name'])
