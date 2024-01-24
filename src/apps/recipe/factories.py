@@ -1,13 +1,12 @@
 import factory
 from factory.django import DjangoModelFactory
 
-from apps.recipe.models import Recipe
 from apps.user.factories import UserFactory
 
 
 class RecipeFactory(DjangoModelFactory):
     class Meta:
-        model = Recipe
+        model = "recipe.Recipe"
 
     user = factory.SubFactory(UserFactory)
     title = factory.Faker('sentence', nb_words=3)
