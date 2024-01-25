@@ -117,7 +117,7 @@ class PrivateRecipeApiTest(TestCase):
 
     def test_create_tag_on_update_recipe(self):
         """Test updating a recipe with creating tags."""
-        recipe = Recipe.objects.create(user=self.user)
+        recipe = RecipeFactory.create(user=self.user)
 
         payload = {'tags': [{'name': 'Lunch'}]}
         url = detail_url(recipe.id)
