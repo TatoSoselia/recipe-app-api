@@ -14,6 +14,11 @@ from apps.recipe.serializers import IngredientSerializer
 INGREDIENT_URL = reverse('recipe:ingredient-list')
 
 
+def detail_url(ingredient_id):
+    """Create and return an ingredient detail URL."""
+    return reverse('recipe:ingredient-detail', args=[ingredient_id])
+
+
 class PublicIngredientApiTests(TestCase):
     """Test the publicly available ingredients API"""
     def setUp(self):
@@ -61,3 +66,15 @@ class PrivateIngredientApiTests(TestCase):
         for i in range(len(ingredients)):
             self.assertEqual(ingredients[i].name, res.data[i]['name'])
             self.assertEqual(ingredients[i].id, res.data[i]['id'])
+
+    def test_update_ingredient_successful(self):
+        """Test updating an ingredient"""
+        ingredient = IngredientFactory.create(user=self.user, name='name')
+
+        payload = {'name': 'updated name'}
+        url = detail_url(ingredient.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        ingredient.refresh_from_db()
+        self.assertEqual(ingredient.name, res.data['name'])
