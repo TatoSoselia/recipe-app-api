@@ -23,3 +23,11 @@ class TagFactory(DjangoModelFactory):
 
     name = factory.Faker('sentence', nb_words=3)
     user = factory.SubFactory(UserFactory)
+
+
+class IngredientFactory(DjangoModelFactory):
+
+    class Meta:
+        model = "recipe.Ingredient"
+        name = factory.Faker('sentence', nb_words=3)
+        user = factory.SubFactory(UserFactory)
