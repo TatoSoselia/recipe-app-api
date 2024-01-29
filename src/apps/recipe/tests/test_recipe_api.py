@@ -4,7 +4,7 @@ Tests for the Recipe API.
 from django.test import TestCase
 from django.urls import reverse
 
-from apps.recipe.models import Recipe, Tag
+from apps.recipe.models import Recipe, Tag, Ingredient
 from apps.user.factories import UserFactory
 from apps.recipe.factories import RecipeFactory, TagFactory, IngredientFactory
 from apps.recipe.serializers import RecipeSerializer, RecipeDetailSerializer
@@ -202,3 +202,43 @@ class PrivateRecipeApiTest(TestCase):
                 user=self.user,
             ).exists()
             self.assertTrue(exists)
+
+    def test_create_ingredient_on_update(self):
+        """Test creating an ingredient when updating a recipe."""
+        recipe = RecipeFactory.create(user=self.user)
+
+        payload = {'ingredients': [{'name': 'Limes'}]}
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        new_ingredient = Ingredient.objects.get(user=self.user, name='Limes')
+        self.assertIn(new_ingredient, recipe.ingredients.all())
+
+    def test_update_recipe_assign_ingredient(self):
+        """Test assigning an existing ingredient when updating a recipe."""
+        ingredient1 = IngredientFactory.create(user=self.user, name='Pepper')
+        recipe = RecipeFactory.create(user=self.user)
+        recipe.ingredients.add(ingredient1)
+
+        ingredient2 = IngredientFactory.create(user=self.user, name='Chili')
+        payload = {'ingredients': [{'name': 'Chili'}]}
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn(ingredient2, recipe.ingredients.all())
+        self.assertNotIn(ingredient1, recipe.ingredients.all())
+
+    def test_clear_recipe_ingredients(self):
+        """Test clearing a recipes ingredients."""
+        ingredient = IngredientFactory.create(user=self.user, name='Garlic')
+        recipe = RecipeFactory.create(user=self.user)
+        recipe.ingredients.add(ingredient)
+
+        payload = {'ingredients': []}
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(recipe.ingredients.count(), 0)
