@@ -4,6 +4,7 @@ Tests for the Recipe API.
 from django.test import TestCase
 from django.urls import reverse
 
+from apps.recipe import models
 from apps.recipe.models import Recipe, Tag, Ingredient
 from apps.user.factories import UserFactory
 from apps.recipe.factories import RecipeFactory, TagFactory, IngredientFactory
@@ -11,6 +12,8 @@ from apps.recipe.serializers import RecipeSerializer, RecipeDetailSerializer
 
 from rest_framework import status
 from rest_framework.test import APIClient
+
+from unittest.mock import patch
 
 import decimal
 
@@ -20,6 +23,18 @@ RECIPE_URL = reverse('recipe:recipe-list')
 def detail_url(recipe_id):
     """Create and return a recipe detail URL."""
     return reverse('recipe:recipe-detail', args=[recipe_id])
+
+
+class GeneratingImagePathTest(TestCase):
+    """Test the generating image path."""
+    @patch('apps.recipe.models.uuid.uuid4')
+    def test_recipe_file_name_uuid(self, mock_uuid):
+        """Test generating image path."""
+        uuid = 'test-uuid'
+        mock_uuid.return_value = uuid
+        file_path = models.recipe_image_file_path(None, 'example.jpg')
+
+        self.assertEqual(file_path, f'uploads/recipe/{uuid}.jpg')
 
 
 class PublicRecipeApiTests(TestCase):
