@@ -45,3 +45,13 @@ lint:
 test:
 	@echo "Running Tests..."
 	docker compose run --rm api python manage.py test
+
+# Run Django tests with coverage
+test_coverage:
+	@echo "Running Django tests with coverage..."
+	docker compose run --rm api coverage run manage.py test
+
+# Generate coverage report
+coverage_report:
+	@echo "Generating coverage report..."
+	docker compose run --rm api coverage report
